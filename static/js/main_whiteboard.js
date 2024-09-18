@@ -9,7 +9,7 @@ pixieBoard.lineWidth = 2;
 pixieBoard.init();
 var whiteboardInitialised = false; 
 
-export const socket = io.connect('http://localhost:8000');
+export const socket = io.connect('https://pixieboard.onrender.com/');
 socket.emit('newClientJoined', "New Client has joined");
 
 socket.on('currentState', data =>{
