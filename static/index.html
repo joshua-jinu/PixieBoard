@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PixieBoard</title>
+    <link rel='stylesheet' href="/css/main_whiteboard.css" type="text/css">
+    <script src="http://localhost:8000/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+    <script src="/js/main_whiteboard.js" type="module"></script>
+    <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+</head>
+
+<body>
+    <canvas id="whiteboard">
+        Sorry, your browser does not support this Whiteboard. Please try using the latest version of Google Crome or
+        FireFox
+    </canvas>
+    <script>
+        // to refer to the canvas tag
+        var whiteboard = document.getElementById('whiteboard');
+        // set height of drawing surfave to match the canvas
+        whiteboard.height = innerHeight;
+        whiteboard.width = innerWidth;
+        //to refer to the 2d drawing context
+        var ctx = whiteboard.getContext('2d');
+    </script>
+
+    <!-- the toolbox for the whiteboard -->
+    <!-- structure for droupdowns #toolbox_droupdown (img) ul li  -->
+    <div class='toolbox'>
+        <div class="tool_dropdown" data-dropdown="single">
+            <div class="tool" data-command="undo" title="Undo">
+                <img src="/images/undo_icon.png">
+            </div>
+            <ul>
+                <li>
+                    <div class= "tool" data-command="redo" title="Redo">
+                        <img src="images/redo_icon.png">
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="tool" data-command="export_whiteboard" title="Export Whiteboard">
+            <img src="images/export_icon.png">
+        </div>
+        <div class="tool active" data-tool="pencil" title="Pencil">
+            <img src="images/pencil_icon.png">
+        </div>
+        <div class="tool_dropdown" data-dropdown="single">
+            <div class="tool" data-tool="eraser" title="Eraser">
+                <img src="images/eraser_icon.png">
+            </div>
+            <ul>
+                <li>
+                    <div class="tool" data-command="clear_whiteboard" title="Clear_Whiteboard">
+                        <img src="images/clear_icon.png">
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="tool_dropdown" data-dropdown="multiple" title="Shapes">
+            <img src="images/shapes_icon.png">
+                <ul>
+                    <li>
+                        <div class="tool" data-tool="circle" title="Circle">
+                            <img src="images/circle_icon.png">
+                        </div>
+                    </li>
+                    <li>
+                        <div class="tool" data-tool="rectangle" title="Rectangle">
+                            <img src="images/rectangle_icon.png">
+                        </div>
+                    </li>
+                    <li>
+                        <div class="tool" data-tool="triangle" title="Triangle">
+                            <img src="images/triangle_icon.png">
+                        </div>
+                    </li>
+                    <li>
+                        <div class="tool" data-tool="line" title="Line">
+                            <img src="images/line_icon.png">
+                        </div>
+                    </li>
+                </ul>
+        </div>
+        <div class="tool_dropdown" data-dropdown="multiple" title="Upload">
+            <img src="images/upload_icon.png">
+            <ul>
+                <li>
+                    <div class="tool" data-upload-type="image" title="Uplaod Image File">
+                        <input type="file" id="file" accept="image/*">
+                        <label for="file">
+                            <img src="images/upload_image_icon.png">
+                        </label>
+                    </div>
+                </li>
+                <li>
+                    <div class="tool" data-upload-type="pdf" title="Uplaod PDF File">
+                        <input type="file" id="file" accept="application/pdf">
+                        <label for="file">
+                            <img src="images/upload_pdf_icon.png">
+                        </label>
+                    </div>
+                </li>
+        </div>
+        <div class="tool_dropdown" data-dropdown="multiple" title="Color">
+            <img src="images/color_pallet.png">
+                <ul>
+                    <li>
+                        <div class="tool active" data-color="#000000" title="Black">
+                            <div class="color active" style="background-color: #000000"></div>
+                        </div>
+                    </li><li>
+                        <div class=tool data-color="#ff0000" title="Red">
+                            <div class="color" style="background-color: red;"></div>
+                        </div>
+                    </li><li>
+                        <div class=tool data-color="#0000ff" title="Blue">
+                            <div class="color" style="background-color: blue;"></div>
+                        </div>
+                    </li><li>
+                        <div class=tool data-color="	#FFA500" title="Orange">
+                            <div class="color" style="background-color: #FFA500;"></div>
+                        </div>
+                    </li><li>
+                        <div class=tool data-color="#8D38C9" title="Violet">
+                            <div class="color" style="background-color: #8D38C9;"></div>
+                        </div>
+                    </li>
+                    </li><li>
+                        <div class=tool data-color="#4CC417" title="AppleGreen">
+                            <div class="color" style="background-color: #4CC417;"></div>
+                        </div>
+                    </li>
+                    </li><li>
+                        <div class=tool data-color="#F660AB" title="Pink">
+                            <div class="color" style="background-color: #F660AB;"></div>
+                        </div>
+                    </li>
+                    </li><li>
+                        <div class=tool data-color="#36F57F" title="Neon Green">
+                            <div class="color" style="background-color: #36F57F;"></div>
+                        </div>
+                    </li>
+                    </li><li>
+                        <div class=tool data-color="#FFFF00" title="Yellow">
+                            <div class="color" style="background-color: #FFFF00;"></div>
+                        </div>
+                    </li>
+                    </li>
+                    </li><li>
+                        <div class=tool data-color="#e54ed0" title="Bright Pink">
+                            <div class="color" style="background-color: #e54ed0;"></div>
+                        </div>
+                    </li>
+                    </li>
+                    <!-- <li>
+                        <div class=tool data-color="galaxy_gradient" title="Galaxy">
+                            <div class="gradient">
+                                <img src="/images/galaxy_gradient.png">
+                            </div>
+                        </div>
+                    </li> -->
+                </ul>
+        </div>
+        <div class="tool" data-tool="text" title="Text">
+            <img src="images/text_icon.png">
+        </div>
+        <div class="tool_dropdown" data-dropdown="multiple" title="Line Size">
+            <img src="images/line_thickness.png">
+                <ul>
+                    <li>
+                        <div class="tool active" data-line-width="2" title = "1" >
+                            <div class="linewidth" style="width: 2px; height: 2px;"></div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="tool" data-line-width="4" title = "2" >
+                            <div class="linewidth" style="width: 4px; height: 4px;"></div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="tool" data-line-width="6" title = "3" >
+                            <div class="linewidth" style="width: 6px; height: 6px;"></div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="tool" data-line-width="8" title = "4" >
+                            <div class="linewidth" style="width: 8px; height: 8px;"></div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="tool" data-line-width="10" title = "5" >
+                            <div class="linewidth" style="width: 10px; height: 10px;"></div>
+                        </div>
+                    </li>
+                </ul>
+        </div>
+    </div>
+    <div class="whiteboard_selection">
+        <div class="whiteboard_select" id="previous_whiteboard" data-whiteboard-select="previous_whiteboard">
+            <img src="images/previous_icon.png">
+        </div>
+        <div class="whiteboard_select" id="whiteboard_number" data-whiteboard-select="whiteboard_number">
+            <h2 id="whiteboard_no">1</h2>
+        </div>
+        <div class="whiteboard_select" id="next_whiteboard" data-whiteboard-select="next_whiteboard">
+            <img src="images/next_icon.png">
+        </div>
+        <div class="whiteboard_select" id="add_whiteboard" data-whiteboard-select="add_whiteboard">
+            <img src="images/add_icon.jpg">
+        </div>
+    </div>
+    <div class="upload_manage">
+        <div class="upload_page" id="previous_page" data-page-select="previous_page">
+            <img src="images/previous_icon.png">
+        </div>
+        <div class="upload_page" id="next_page" data-page-select="next_page">
+            <img src="images/next_icon.png">
+        </div>
+    </div>
+    <div class='text_inputs' id="text_inputs">
+    </div>
+</body>
+
+</html>
