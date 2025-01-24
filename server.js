@@ -11,7 +11,7 @@ const io = socket(server);
 var connectedClients = [];
 var newClientId = ' ';
 
-console.log('Code Complied Successfully...', newClientId);
+console.log('Code Complied Successfully...', 'Server running on 8080');
 
 //set folder for html, css and js
 app.use(express.static(path.join(__dirname, 'static')));
